@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from '@prisma/client';
 import {PrismaPg} from '@prisma/adapter-pg'
 import { hashPassword } from "../utils/hashPassword";
-import { error } from "node:console";
 
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL!
