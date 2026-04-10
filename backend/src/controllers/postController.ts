@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-import { PrismaClient } from '@prisma/client';
+import { Request, Response, NextFunction } from "express"
+import { PrismaClient } from '@prisma/client'
 import {PrismaPg} from '@prisma/adapter-pg'
-import { error } from "node:console";
-import { setMaxListeners } from "node:cluster";
+import { AuthRequest } from "../middlewares/auth"
 
 
 const adapter = new PrismaPg({
@@ -60,28 +59,20 @@ export const getPostById = async (req: Request, res: Response, next: NextFunctio
 }
 
 // POST createPost
-export const createPost = async (req: Request, res: Response, next: NextFunction) =>
+export const createPost = async (req: AuthRequest, res: Response, next: NextFunction) =>
 {
     try {
-        const {title, description, imageUrl, authorId} = req.body
-        if (!title || !authorId) {
-            res.status(400).json({error: 'Missing required fields: title, authorId'})
+        const {title, description, imageUrl} = req.body
+        const authorId = req.user!.id
+
+        if (!title) {
+            res.status(400).json({ error: 'Title required'})
             return
         }
 
-        const author = await prisma.user.findUnique({ where: { id: Number(authorId) }})
-        if (!author) {
-            res.status(404).json({error: 'Author not found'})
-        }
-
         const newPost = await prisma.post.create({
-            data: {
-                title,
-                description,
-                imageUrl,
-                authorId: Number(authorId)
-            },
-            include: { author: {select: {id: true, username: true}}}
+            data: {title, description, imageUrl, authorId},
+            include: {author: {select: {id: true, username: true}}}
         })
         res.status(201).json(newPost)
     } catch (error) {
@@ -94,7 +85,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
 {
     try {
         const {id} = req.params
-        const {title, description, imageUrl, points} = req.body
+        const {title, description, imageUrl} = req.body
         const existingPost = await prisma.post.findUnique({ where: {id: Number(id)}})
 
         if (!existingPost) {
@@ -104,7 +95,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
 
         const updatedPost = await prisma.post.update({
             where: {id: Number(id)},
-            data: {title, description, imageUrl, points},
+            data: {title, description, imageUrl},
             include: {author: {select: {id: true, username: true}}}
         })
         res.json(updatedPost)

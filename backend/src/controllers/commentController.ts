@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from '@prisma/client';
 import {PrismaPg} from '@prisma/adapter-pg'
-import { error } from "node:console";
 
 
 const adapter = new PrismaPg({
@@ -96,7 +95,7 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
 {
     try {
         const {id} = req.params
-        const {text, points} = req.body
+        const {text} = req.body
         const existing = await prisma.comment.findUnique({where: {id: Number(id)}})
 
         if (!existing){
@@ -106,7 +105,7 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
 
         const update = await prisma.comment.update({
             where: {id: Number(id)},
-            data: {text, points},
+            data: {text},
             include: {author: {select: {id: true, username: true}}}
         })
         res.json(update)
