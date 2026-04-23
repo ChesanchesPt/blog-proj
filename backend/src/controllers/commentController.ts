@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from '@prisma/client';
 import {PrismaPg} from '@prisma/adapter-pg'
+import { AuthRequest } from "../middlewares/auth"
 
 
 const adapter = new PrismaPg({
@@ -9,7 +10,7 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({adapter});
 
 // GET getCommentsByPost
-export const getCommentsByPost = async (req: Request, res: Response, next: NextFunction) =>
+export const getCommentsByPost = async (req: AuthRequest, res: Response, next: NextFunction) =>
 {
     try {
         const { postId } = req.params
@@ -31,7 +32,7 @@ export const getCommentsByPost = async (req: Request, res: Response, next: NextF
 }
 
 // GET getCommentById
-export const getCommentById = async (req: Request, res: Response, next: NextFunction) =>
+export const getCommentById = async (req: AuthRequest, res: Response, next: NextFunction) =>
 {
     try {
         const {id} = req.params
@@ -53,7 +54,7 @@ export const getCommentById = async (req: Request, res: Response, next: NextFunc
 }
 
 // POST createComment
-export const createComment = async (req: Request, res: Response, next: NextFunction) =>
+export const createComment = async (req: AuthRequest, res: Response, next: NextFunction) =>
 {
     try {
         const {text, authorId, postId} = req.body
@@ -91,15 +92,20 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
 }
 
 // PUT updateComment
-export const updateComment = async (req: Request, res: Response, next: NextFunction) =>
+export const updateComment = async (req: AuthRequest, res: Response, next: NextFunction) =>
 {
     try {
         const {id} = req.params
         const {text} = req.body
-        const existing = await prisma.comment.findUnique({where: {id: Number(id)}})
+        const comment = await prisma.comment.findUnique({where: {id: Number(id)}})
 
-        if (!existing){
+        if (!comment){
             res.status(404).json({error: 'Comment not found'})
+            return
+        }
+
+        if (comment.authorId !== req.user!.id && !req.user!.isAdmin) {
+            res.status(403).json({error: 'Forbidden'})
             return
         }
 
@@ -115,14 +121,19 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
 }
 
 // DELETE deleteComment
-export const deleteComment = async (req: Request, res: Response, next: NextFunction) =>
+export const deleteComment = async (req: AuthRequest, res: Response, next: NextFunction) =>
 {
     try {
         const {id} = req.params
-        const existing = await prisma.comment.findUnique({where: {id: Number(id)}})
+        const comment = await prisma.comment.findUnique({where: {id: Number(id)}})
 
-        if (!existing) {
+        if (!comment) {
             res.status(404).json({error: 'Comment not found'})
+            return
+        }
+
+        if (comment.authorId !== req.user!.id && !req.user!.isAdmin) {
+            res.status(403).json({error: 'Forbidden'})
             return
         }
 

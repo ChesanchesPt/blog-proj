@@ -11,7 +11,7 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({adapter});
 
 // GET getPosts
-export const getPosts = async (req: Request, res: Response, next: NextFunction) =>
+export const getPosts = async (req: AuthRequest, res: Response, next: NextFunction) =>
 {
     try {
         const { authorId } = req.query
@@ -20,7 +20,7 @@ export const getPosts = async (req: Request, res: Response, next: NextFunction) 
             where,
             include: {
                 author:{
-                    select: { id: true, username: true, isAdmin: true }
+                    select: { id: true, username: true }
                 }
             },
             orderBy: { createdAt: 'desc' }
@@ -32,7 +32,7 @@ export const getPosts = async (req: Request, res: Response, next: NextFunction) 
 }
 
 // GET getPostById
-export const getPostById = async (req: Request, res: Response, next: NextFunction) =>
+export const getPostById = async (req: AuthRequest, res: Response, next: NextFunction) =>
 {
     try {
         const {id} = req.params
@@ -40,10 +40,10 @@ export const getPostById = async (req: Request, res: Response, next: NextFunctio
             where: {id: Number(id)},
             include: {
                 author: {
-                    select: {id:true, username:true}
+                    select: { id: true, username: true}
                 },
                 comments: {
-                    include:{author:{select:{id:true, username:true}}},
+                    include: {author: {select: {id: true, username: true}}},
                     orderBy: {createdAt: 'asc'}
                 }
             }
@@ -81,15 +81,20 @@ export const createPost = async (req: AuthRequest, res: Response, next: NextFunc
 }
 
 // PUT updatePost
-export const updatePost = async (req: Request, res: Response, next: NextFunction) =>
+export const updatePost = async (req: AuthRequest, res: Response, next: NextFunction) =>
 {
     try {
         const {id} = req.params
         const {title, description, imageUrl} = req.body
-        const existingPost = await prisma.post.findUnique({ where: {id: Number(id)}})
+        const post = await prisma.post.findUnique({ where: {id: Number(id)}})
 
-        if (!existingPost) {
+        if (!post) {
             res.status(404).json({error: 'Post not found'})
+            return
+        }
+
+        if (post.authorId !== req.user!.id && !req.user!.isAdmin) {
+            res.status(403).json({error: 'Forbidden'})
             return
         }
 
@@ -105,15 +110,20 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
 }
 
 // DELETE deletePost
-export const deletePost = async (req: Request, res: Response, next: NextFunction) =>
+export const deletePost = async (req: AuthRequest, res: Response, next: NextFunction) =>
 {
     try {
         const {id} = req.params
-        const existingPost = await prisma.post.findUnique({where: {id: Number(id)}})
+        const post = await prisma.post.findUnique({where: {id: Number(id)}})
 
-        if (!existingPost) {
+        if (!post) {
             res.status(404).json({error: 'Post not found'})
             return
+        }
+
+        if (post.authorId !== req.user!.id && !req.user!.isAdmin) {
+            res.status(403).json({ error: 'Forbidden' });
+            return;
         }
 
         await prisma.post.delete({where: {id: Number(id)}})

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from '@prisma/client';
 import {PrismaPg} from '@prisma/adapter-pg'
+import { AuthRequest } from "../middlewares/auth"
 
 
 const adapter = new PrismaPg({
@@ -10,12 +11,11 @@ const prisma = new PrismaClient({adapter})
 
 
 // Posts
-export const upvotePost = async (req: Request, res: Response, next: NextFunction) => {
+export const upvotePost = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
-    const { userId } = req.body
+    const userId = req.user!.id
     const postId = Number(id)
-    const numericUserId = Number(userId)
 
     // Проверка существования поста
     const post = await prisma.post.findUnique({ where: { id: postId } })
@@ -27,13 +27,13 @@ export const upvotePost = async (req: Request, res: Response, next: NextFunction
     // Транзакция
     const result = await prisma.$transaction(async (tx) => {
       const existingVote = await tx.vote.findUnique({
-        where: { userId_postId: { userId: numericUserId, postId } },
+        where: { userId_postId: { userId, postId } },
       })
 
       if (!existingVote) {
         // создаём upvote
         await tx.vote.create({
-          data: { userId: numericUserId, postId, value: 1 },
+          data: { userId, postId, value: 1 },
         });
         await tx.post.update({
           where: { id: postId },
@@ -70,12 +70,11 @@ export const upvotePost = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-export const downvotePost = async (req: Request, res: Response, next: NextFunction) => {
+export const downvotePost = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
-    const { userId } = req.body
+    const userId = req.user!.id
     const postId = Number(id)
-    const numericUserId = Number(userId)
 
     const post = await prisma.post.findUnique({ where: { id: postId } })
     if (!post) {
@@ -85,12 +84,12 @@ export const downvotePost = async (req: Request, res: Response, next: NextFuncti
 
     const result = await prisma.$transaction(async (tx) => {
       const existingVote = await tx.vote.findUnique({
-        where: { userId_postId: { userId: numericUserId, postId } },
+        where: { userId_postId: { userId, postId } },
       })
 
       if (!existingVote) {
         await tx.vote.create({
-          data: { userId: numericUserId, postId, value: -1 },
+          data: { userId, postId, value: -1 },
         })
         await tx.post.update({
           where: { id: postId },
@@ -129,12 +128,11 @@ export const downvotePost = async (req: Request, res: Response, next: NextFuncti
 
 
 // Comments
-export const upvoteComment = async (req: Request, res: Response, next: NextFunction) => {
+export const upvoteComment = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
-    const { userId } = req.body
+    const userId = req.user!.id
     const commentId = Number(id)
-    const numericUserId = Number(userId)
 
     const comment = await prisma.comment.findUnique({ where: { id: commentId } })
     if (!comment) {
@@ -144,12 +142,12 @@ export const upvoteComment = async (req: Request, res: Response, next: NextFunct
 
     const result = await prisma.$transaction(async (tx) => {
       const existingVote = await tx.vote.findUnique({
-        where: { userId_commentId: { userId: numericUserId, commentId } },
+        where: { userId_commentId: { userId, commentId } },
       })
 
       if (!existingVote) {
         await tx.vote.create({
-          data: { userId: numericUserId, commentId, value: 1 },
+          data: { userId, commentId, value: 1 },
         })
         await tx.comment.update({
           where: { id: commentId },
@@ -185,12 +183,11 @@ export const upvoteComment = async (req: Request, res: Response, next: NextFunct
   }
 }
 
-export const downvoteComment = async (req: Request, res: Response, next: NextFunction) => {
+export const downvoteComment = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
-    const { userId } = req.body
+    const userId = req.user!.id
     const commentId = Number(id)
-    const numericUserId = Number(userId)
 
     const comment = await prisma.comment.findUnique({ where: { id: commentId } })
     if (!comment) {
@@ -200,12 +197,12 @@ export const downvoteComment = async (req: Request, res: Response, next: NextFun
 
     const result = await prisma.$transaction(async (tx) => {
       const existingVote = await tx.vote.findUnique({
-        where: { userId_commentId: { userId: numericUserId, commentId } },
+        where: { userId_commentId: { userId, commentId } },
       })
 
       if (!existingVote) {
         await tx.vote.create({
-          data: { userId: numericUserId, commentId, value: -1 },
+          data: { userId, commentId, value: -1 },
         })
         await tx.comment.update({
           where: { id: commentId },

@@ -1,13 +1,13 @@
 import dotenv from 'dotenv'
-dotenv.config();
+dotenv.config()
 
-import express from 'express';
-import cors from 'cors';
+import express from 'express'
+import cors from 'cors'
+import authRoutes from './routes/authRoutes'
 import userRoutes from './routes/userRoutes'
 import postRoutes from './routes/postRoutes'
 import commentRoutes from './routes/commentRoutes'
 import voteRoutes from './routes/voteRoutes'
-import authRoutes from './routes/authRoutes'
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -19,11 +19,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+app.use('/auth', authRoutes)
 app.use('/users', userRoutes)
 app.use('/posts', postRoutes)
 app.use('/', commentRoutes)
 app.use('/', voteRoutes)
-app.use('/auth', authRoutes)
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack)

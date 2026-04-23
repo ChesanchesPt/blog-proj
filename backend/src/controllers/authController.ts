@@ -11,9 +11,42 @@ const adapter = new PrismaPg({
 })
 const prisma = new PrismaClient({adapter})
 
+
+export const register = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { username, password } = req.body
+    if(!username || !password) {
+      res.status(400).json({error: 'Username and password required'})
+      return
+    }
+
+    const existing = await prisma.user.findUnique({where: {username}})
+    if (existing) {
+      res.status(409).json({error: 'Username taken'})
+      return
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const user = await prisma.user.create({
+      data: {username, password: hashedPassword},
+      select: {id: true, username: true, isAdmin: true}
+    })
+
+    const token = jwt.sign(
+      {id: user.id, username: user.username, isAdmin: user.isAdmin },
+      config.jwtSecret!,
+      {expiresIn: '7d'}
+    )
+    res.status(201).json({token, user})
+  } catch (error){
+    next(error)
+  }
+}
+
+
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    
+
     const { username, password } = req.body
     if (!username || !password) {
       res.status(400).json({ error: 'Username and password required' })
