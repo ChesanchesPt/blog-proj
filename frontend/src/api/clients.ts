@@ -1,7 +1,17 @@
+import axios from 'axios';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-export const fetchItems = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/items`);
-  if (!response.ok) throw new Error('Network error');
-  return response.json();
-};
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { 'Content-Type': 'application/json' }
+});
+
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+})
