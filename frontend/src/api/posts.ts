@@ -2,7 +2,7 @@ import {api} from './clients'
 import type {Post, Comment} from '../types'
 
 
-export const getPost = (authorId?: number) =>
+export const getPosts = (authorId?: number) =>
     api.get<Post[]>(`/posts${authorId ? `?authorId=${authorId}` : ''}`)
 
 export const getPostById = (id: number) => 
