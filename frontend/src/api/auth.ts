@@ -1,4 +1,4 @@
-import {api} from './clients'
+import {api} from './client'
 import type {User} from '../types'
 
 

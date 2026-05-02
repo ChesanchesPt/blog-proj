@@ -44,7 +44,7 @@ export const PostsList = () => {
             </h2>
             <p>{post.description?.substring(0, 100)}...</p>
             <p>
-              By {post.author.username} | Points: {post.points} | {new Date(post.createdAt).toLocaleString()}
+              By <Link to={`/users/${post.author.id}`}>{post.author.username}</Link> | Points: {post.points} | {new Date(post.createdAt).toLocaleString()}
             </p>
           </div>
         ))

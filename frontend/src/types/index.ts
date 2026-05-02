@@ -2,6 +2,7 @@ export interface User {
     id: number,
     username: string,
     isAdmin: boolean,
+    createdAt: string,
 }
 
 export interface Post {

@@ -4,6 +4,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { PostsList } from './pages/PostsList';
+import { UserProfile } from './pages/UserProfile';
 // import { PostDetail } from './pages/PostDetail';
 import { CreatePost } from './pages/CreatePost';
 // import { EditPost } from './pages/EditPost';
@@ -15,6 +16,11 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/users/:userId" element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          } />
           <Route path="/" element={
             <ProtectedRoute>
               <PostsList />
