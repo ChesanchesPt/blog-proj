@@ -21,11 +21,13 @@ export const Login = () => {
 
   return (
     <div>
-      <h2>Login</h2>
+      <h1>С возвращением!</h1>
       <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required />
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-        <button type="submit">Login</button>
+        <input type="text" placeholder="Ваш Логин" value={username} onChange={e => setUsername(e.target.value)} required />
+        <input type="password" placeholder="Ваш пароль" value={password} onChange={e => setPassword(e.target.value)} required />
+        <button type="submit">Войти</button>
+        <p>Нет аккаунта?</p>
+        <a href="/register">Зарегистрироваться</a>
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </form>
     </div>

@@ -42,6 +42,7 @@ export const PostsList = () => {
             <h2>
               <Link to={`/posts/${post.id}`}>{post.title}</Link>
             </h2>
+            {post.imageUrl && <img src={post.imageUrl} alt="post" style={{ maxWidth: '100%' }} />}
             <p>{post.description?.substring(0, 100)}...</p>
             <p>
               By <Link to={`/users/${post.author.id}`}>{post.author.username}</Link> | Points: {post.points} | {new Date(post.createdAt).toLocaleString()}

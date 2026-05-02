@@ -57,7 +57,8 @@ export const getCommentById = async (req: AuthRequest, res: Response, next: Next
 export const createComment = async (req: AuthRequest, res: Response, next: NextFunction) =>
 {
     try {
-        const {text, authorId, postId} = req.body
+        const {text, postId} = req.body
+        const authorId = req.user!.id
         if (!text || !authorId || !postId) {
             res.status(400).json({ error: 'Missing required fields: text, authorId, postId'})
         }
