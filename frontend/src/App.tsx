@@ -3,7 +3,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
-import { PostsList } from './pages/PostsList';
+import { Home } from './pages/Home';
 import { UserProfile } from './pages/UserProfile';
 import { PostDetail } from './pages/PostDetail';
 import { CreatePost } from './pages/CreatePost';
@@ -23,7 +23,7 @@ function App() {
           } />
           <Route path="/" element={
             <ProtectedRoute>
-              <PostsList />
+              <Home />
             </ProtectedRoute>
           } />
           <Route path="/posts/:id" element={
