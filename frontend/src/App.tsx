@@ -8,10 +8,12 @@ import { UserProfile } from './pages/UserProfile';
 import { PostDetail } from './pages/PostDetail';
 import { CreatePost } from './pages/CreatePost';
 import { EditPost } from './pages/EditPost';
+import { RecentPostsProvider } from './contexts/RecentPostsContext';
 
 function App() {
   return (
     <AuthProvider>
+      <RecentPostsProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -43,6 +45,7 @@ function App() {
           } />
         </Routes>
       </BrowserRouter>
+      </RecentPostsProvider>
     </AuthProvider>
   );
 }
