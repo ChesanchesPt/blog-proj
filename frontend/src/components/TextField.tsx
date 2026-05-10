@@ -8,17 +8,16 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 export const TextField = ({ label, error, id, className = '', ...props }: TextFieldProps) => {
   const inputId = id || label.toLowerCase().replace(/\s+/g, '-')
   return (
-    <div className="flex flex-col gap-1 mb-4">
+    <div className="flex flex-col gap-1">
       <label htmlFor={inputId} className="text-sm font-bold text-neo-black">
         {label}
       </label>
       <input
         id={inputId}
         className={`
-          w-81 border-3 border-neo-black
-          px-3 py-3 text-sm font-medium bg-white
-          outline-none rounded-md focus:border-accent
-          transition-colors
+          w-81 border-3 border-neo-black px-3 py-2 text-sm font-medium bg-white outline-none 
+          focus:ring-2 focus:ring-accent 
+          transition-shadow hover:shadow-[1px_1px_0px_#1A1A1A]
           ${error ? 'border-red-500' : ''}
           ${className}
         `}
