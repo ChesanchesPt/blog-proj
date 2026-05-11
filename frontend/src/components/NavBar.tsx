@@ -40,12 +40,12 @@ export const Navbar = () => {
         </form>
 
         <div className="flex items-center gap-3">
-            <ButtonSubmit className='flex-row gap-2.5'>
+            <ButtonSubmit onClick={() => navigate('/create')} className='max-w-25 flex-row gap-2.5' variant='accent'>
                 <img src='/icons/add.svg' />
-                <Link to='/create'>Создать</Link>
+                <p>Создать</p>
             </ButtonSubmit>
-            <ButtonSubmit className='w-10'>
-                <Link to={`/users/${user.id}`}>{user?.username}</Link>
+            <ButtonSubmit onClick={() => navigate(`/users/${user.id}`)} className='max-w-25 overflow-hidden' variant='accent'>
+                <p>{user?.username}</p>
             </ButtonSubmit>
         </div>
       </div>    

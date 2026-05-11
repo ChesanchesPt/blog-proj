@@ -5,7 +5,7 @@ export const RecentNav = () => {
   const { recentPosts } = useRecentPosts();
 
   return (
-    <aside className="w-80 hidden lg:block sticky top-20 self-start">
+    <aside className="w-80 lg:block sticky top-20 self-start">
       <div className="border-3 border-neo-black shadow-[4px_4px_0px_#1A1A1A] bg-white p-4 font-mono">
         <h2 className="text-xl font-black mb-3 border-b-3 border-neo-black pb-2">
           Недавние посты
