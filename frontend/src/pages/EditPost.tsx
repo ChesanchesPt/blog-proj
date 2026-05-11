@@ -18,7 +18,6 @@ export const EditPost = () => {
       try {
         const res = await getPostById(Number(id));
         const post = res.data;
-        // Authorization check
         if (user?.id !== post.authorId && !user?.isAdmin) {
           navigate('/');
           return;

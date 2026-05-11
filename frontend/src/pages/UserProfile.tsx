@@ -38,9 +38,9 @@ export const UserProfile = () => {
     navigate('/login');
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Загрузка...</div>;
   if (error) return <div style={{ color: 'red' }}>{error}</div>;
-  if (!user) return <div>User not found</div>;
+  if (!user) return <div>Пользователь не найден</div>;
 
   return (
     <div>
@@ -50,9 +50,9 @@ export const UserProfile = () => {
         <button onClick={handleLogout}>Logout</button>
       )}
 
-      <h2>Posts by {user.username}</h2>
+      <h2>Посты от {user.username}</h2>
       {posts.length === 0 ? (
-        <p>No posts yet.</p>
+        <p>Постов еще нет</p>
       ) : (
         posts.map(post => (
           <div key={post.id} style={{ border: '1px solid #ddd', margin: '10px 0', padding: '10px' }}>
@@ -60,11 +60,11 @@ export const UserProfile = () => {
               <h3>{post.title}</h3>
             </Link>
             <p>{post.description?.substring(0, 150)}...</p>
-            <small>Points: {post.points} | {new Date(post.createdAt).toLocaleDateString()}</small>
+            <small>Очков: {post.points} | {new Date(post.createdAt).toLocaleDateString()}</small>
           </div>
         ))
       )}
-      <Link to="/">← Back to Home</Link>
+      <Link to="/">На главную</Link>
     </div>
   );
 };

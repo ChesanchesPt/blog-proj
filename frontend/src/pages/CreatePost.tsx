@@ -62,7 +62,10 @@ export const CreatePost = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={6}
-              className="w-full border-3 border-neo-black shadow-[4px_4px_0px_#1A1A1A] px-3 py-3 text-sm font-medium bg-white outline-none focus:ring-2 focus:ring-neo-accent transition-shadow hover:shadow-[2px_2px_0px_#1A1A1A] resize-y"
+              className="w-full border-3 border-neo-black shadow-[4px_4px_0px_#1A1A1A] px-3 py-3 
+              text-sm font-medium bg-white outline-none 
+              focus:ring-2 focus:ring-neo-accent 
+              transition-shadow hover:shadow-[2px_2px_0px_#1A1A1A] resize-y"
             />
             <span className="text-xs text-gray-500 text-right">
               {description.length} символов

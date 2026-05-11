@@ -28,7 +28,7 @@ export const PostDetail = () => {
       const res = await getPostById(Number(id));
       setPost(res.data);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load post');
+      setError(err.response?.data?.error || 'Не получилось загрузить пост');
     } finally {
       setLoading(false);
     }
@@ -38,7 +38,7 @@ export const PostDetail = () => {
     if (!user) return;
     try {
       await upvotePost(Number(id));
-      await loadPost(); // refresh
+      await loadPost();
     } catch (err) {
       console.error(err);
     }
@@ -63,7 +63,7 @@ export const PostDetail = () => {
       setCommentText('');
       await loadPost(); // refresh comments
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Failed to post comment');
+      alert(err.response?.data?.error || 'Не удалось опубликовать комментарий');
     } finally {
       setSubmitting(false);
     }
@@ -93,7 +93,7 @@ export const PostDetail = () => {
       await deleteComment(commentId);
       await loadPost();
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Failed to delete comment');
+      alert(err.response?.data?.error || 'Не удалось удалить комментарий');
     }
   };
 
@@ -103,13 +103,13 @@ export const PostDetail = () => {
       await deletePost(Number(id));
       navigate('/');
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Failed to delete post');
+      alert(err.response?.data?.error || 'Не удалось удалить пост');
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Загрузка...</div>;
   if (error) return <div style={{ color: 'red' }}>{error}</div>;
-  if (!post) return <div>Post not found</div>;
+  if (!post) return <div>Пост не найден</div>;
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
@@ -122,12 +122,12 @@ export const PostDetail = () => {
       <p>{post.description || '(no description)'}</p>
 
       <div>
-        <button onClick={handleUpvotePost}>⬆️ Upvote ({post.points})</button>
-        <button onClick={handleDownvotePost}>⬇️ Downvote</button>
+        <button onClick={handleUpvotePost}>Upvote ({post.points})</button>
+        <button onClick={handleDownvotePost}>Downvote</button>
         {canModify && (
           <>
-            <Link to={`/edit/${post.id}`}><button>✏️ Edit</button></Link>
-            <button onClick={handleDeletePost} style={{ backgroundColor: 'red', color: 'white' }}>🗑️ Delete</button>
+            <Link to={`/edit/${post.id}`}><button>Редактировать</button></Link>
+            <button onClick={handleDeletePost} style={{ backgroundColor: 'red', color: 'white' }}>Удалить</button>
           </>
         )}
       </div>
@@ -136,20 +136,20 @@ export const PostDetail = () => {
 
       <h3>Comments</h3>
       {post.comments && post.comments.length === 0 ? (
-        <p>No comments yet. Be the first!</p>
+        <p>Комментариев пока нет. Будьте первым!</p>
       ) : (
         post.comments?.map((comment: Comment) => (
           <div key={comment.id} style={{ border: '1px solid #eee', padding: '10px', margin: '10px 0' }}>
             <p>{comment.text}</p>
             <small>
-              By <Link to={`/users/${comment.author.id}`}>{comment.author.username}</Link> | 
-              Points: {comment.points} | {new Date(comment.createdAt).toLocaleString()}
+              От <Link to={`/users/${comment.author.id}`}>{comment.author.username}</Link> | 
+              Очков: {comment.points} | {new Date(comment.createdAt).toLocaleString()}
             </small>
             <div>
               <button onClick={() => handleUpvoteComment(comment.id)}>⬆️</button>
               <button onClick={() => handleDownvoteComment(comment.id)}>⬇️</button>
               {(user?.id === comment.authorId || user?.isAdmin) && (
-                <button onClick={() => handleDeleteComment(comment.id)}>Delete</button>
+                <button onClick={() => handleDeleteComment(comment.id)}>Удалить</button>
               )}
             </div>
           </div>
@@ -160,13 +160,13 @@ export const PostDetail = () => {
         <form onSubmit={handleCommentSubmit}>
           <textarea
             rows={3}
-            placeholder="Write a comment..."
+            placeholder="Напишите комментарий"
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             required
             style={{ width: '100%', marginBottom: '10px' }}
           />
-          <button type="submit" disabled={submitting}>Post Comment</button>
+          <button type="submit" disabled={submitting}>Опубликовать</button>
         </form>
       )}
     </div>

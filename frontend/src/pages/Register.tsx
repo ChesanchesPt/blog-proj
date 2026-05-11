@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { TextField } from '../components/TextField';
 import { ButtonSubmit } from '../components/ButtonSubmit';
+import { ErrorMessage } from '../utils/loadingError';
 
 export const Register = () => {
   const [username, setUsername] = useState('');
@@ -32,21 +33,17 @@ export const Register = () => {
     <div className='flex flex-col h-screen items-center justify-center'>
       <h1 className='text-5xl font-bold mb-8'>Добро пожаловать!</h1>
       <form onSubmit={handleSubmit}>
-        <TextField label='Ваш Логин' onChange={(e) => setUsername(e.target.value)}/>
-        <TextField label='Ваш пароль' type='password' onChange={(e) => setPassword(e.target.value)}/>
+        <TextField className='mb-4' label='Ваш Логин' onChange={(e) => setUsername(e.target.value)}/>
+        <TextField className='mb-4' label='Ваш пароль' type='password' onChange={(e) => setPassword(e.target.value)}/>
         
-        <ButtonSubmit type='submit' loading={loading}>
+        <ButtonSubmit className='mb-4' type='submit' loading={loading}>
             Зарегистрироваться
           </ButtonSubmit>
 
         <p className='text-sm underline text-center'>Есть аккаунт?</p>
         <Link to="/login" className='text-sm font-bold block text-center text-accent'>Войти</Link>
         
-        {error && (
-          <p role="alert" style={{ color: 'red' }} className='text-center'>
-            {error}
-          </p>
-        )}
+        {error && (<ErrorMessage message={error} />)}
       </form>
     </div>
   );

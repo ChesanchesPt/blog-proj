@@ -19,7 +19,7 @@ export const Home = () => {
       const res = await getPosts();
       setPosts(res.data);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load posts');
+      setError(err.response?.data?.error || 'Не получилось загрузить посты');
     } finally {
       setLoading(false);
     }
@@ -29,9 +29,9 @@ export const Home = () => {
     <>
       <Navbar />
       <div className="max-w-6xl mx-auto px-4 py-6 flex gap-6">
-        <main className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0">
           <PostsList posts={posts} loading={loading} error={error} />
-        </main>
+        </div>
         <RecentNav />
       </div>
     </>
