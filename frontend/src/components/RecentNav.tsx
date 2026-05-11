@@ -20,7 +20,8 @@ export const RecentNav = () => {
               <li key={post.id}>
                 <Link
                   to={`/posts/${post.id}`}
-                  className="block text-sm font-medium hover:underline hover:bg-neo-yellow px-1 -mx-1 transition-colors"
+                  className="block text-sm font-medium 
+                  hover:underline hover:bg-neo-yellow px-1 -mx-1 transition-colors"
                 >
                   {post.title}
                 </Link>

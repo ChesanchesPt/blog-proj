@@ -35,7 +35,9 @@ export const Navbar = () => {
                 placeholder="Поиск постов..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-100 border-3 border-neo-black px-3 py-2 text-sm font-medium bg-white outline-none focus:ring-2 focus:ring-accent transition-shadow hover:shadow-[1px_1px_0px_#1A1A1A]"
+                className={`w-100 border-3 border-neo-black px-3 py-2 text-sm font-medium 
+                  bg-white outline-none focus:ring-2 focus:ring-accent transition-shadow 
+                  hover:shadow-[1px_1px_0px_#1A1A1A]`}
             />
         </form>
 
