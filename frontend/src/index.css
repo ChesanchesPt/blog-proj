@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+@layer components {
+  .card-border {
+    @apply border-3 border-black;
+  }
+
+  .card-shadow {
+    @apply shadow-[3px_3px_0px_#1A1A1A];
+  }
+
+  .card-hover {
+    @apply hover:shadow-[5px_5px_0px_#1A1A1A] hover:-translate-y-0.5 transition-all;
+  }
+
+  .button-active {
+    @apply active:translate-x-0.5 active:translate-y-0.5;
+  }
+}
 
 @theme {
     --color-accent: #FF6B6B;

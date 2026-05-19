@@ -6,8 +6,8 @@ export const RecentNav = () => {
 
   return (
     <aside className="w-80 lg:block sticky top-20 self-start">
-      <div className="border-3 border-neo-black shadow-[4px_4px_0px_#1A1A1A] bg-white p-4 font-mono">
-        <h2 className="text-xl font-black mb-3 border-b-3 border-neo-black pb-2">
+      <div className="border-3 border-black shadow-[4px_4px_0px_#1A1A1A] bg-white p-4 font-mono">
+        <h2 className="text-xl font-black mb-3 border-b-3 border-black pb-2">
           Недавние посты
         </h2>
         {recentPosts.length === 0 ? (
@@ -21,7 +21,7 @@ export const RecentNav = () => {
                 <Link
                   to={`/posts/${post.id}`}
                   className="block text-sm font-medium 
-                  hover:underline hover:bg-neo-yellow px-1 -mx-1 transition-colors"
+                  hover:underline hover:bg-accent px-1 -mx-1 transition-colors"
                 >
                   {post.title}
                 </Link>
