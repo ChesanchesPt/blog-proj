@@ -13,13 +13,13 @@ export const PostCard = ({ post }: PostCardProps) => {
 
   return (
     <article
-      className="max-w-185 border-3 border-neo-black bg-white p-4 transition-shadow 
+      className="max-w-185 border-3 border-black bg-white p-4 transition-shadow 
       hover:shadow-[2px_2px_0px_#1A1A1A] hover:-translate-y-0.5"
     >
       <div className="flex flex-wrap gap-x-4 mb-2.5 items-center text-[14px] font-medium text-black">
         <span>
           Автор:{' '}
-          <Link to={`/users/${post.author.id}`} className="font-bold underline hover:bg-neo-yellow">
+          <Link to={`/users/${post.author.id}`} className="font-bold underline hover:bg-accent">
             {post.author.username}
           </Link>
         </span>
@@ -39,7 +39,7 @@ export const PostCard = ({ post }: PostCardProps) => {
         <img
           src={post.imageUrl}
           alt={`Изображение для ${post.title}`}
-          className="max-w-175 w-full max-h-135 object-contain border-2 border-neo-black mb-4"
+          className="max-w-175 w-full max-h-135 object-contain border-2 border-black mb-4"
         />
       )}
 
