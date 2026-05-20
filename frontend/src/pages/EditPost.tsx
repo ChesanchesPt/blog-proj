@@ -2,6 +2,11 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getPostById, updatePost } from '../api/posts';
+import { Navbar } from '../components/NavBar';
+import { TextField } from '../components/TextField';
+import { ButtonSubmit } from '../components/ButtonSubmit';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { ErrorMessage } from '../components/ErrorMessage';
 
 export const EditPost = () => {
   const { id } = useParams<{ id: string }>();
@@ -10,6 +15,7 @@ export const EditPost = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [submitError, setSubmitError] = useState('');
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -36,37 +42,89 @@ export const EditPost = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setSubmitError('');
     try {
       await updatePost(Number(id), { title, description, imageUrl: imageUrl || undefined });
       navigate(`/posts/${id}`);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to update post');
+      setSubmitError(err.response?.data?.error || 'Failed to update post');
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div style={{ color: 'red' }}>{error}</div>;
+  if (loading) return <><Navbar /><LoadingSpinner /></>;
+  if (error) return <><Navbar /><div className="max-w-2xl mx-auto px-4 py-6"><ErrorMessage message={error} /></div></>;
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
-      <h2>Edit Post</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Title *</label>
-          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        </div>
-        <div>
-          <label>Description</label>
-          <textarea rows={6} value={description} onChange={(e) => setDescription(e.target.value)} />
-        </div>
-        <div>
-          <label>Image URL</label>
-          <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-        </div>
-        <button type="submit">Save Changes</button>
-        <button type="button" onClick={() => navigate(`/posts/${id}`)}>Cancel</button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </form>
-    </div>
+    <>
+      <Navbar />
+      <div className="max-w-2xl mx-auto px-4 py-6 gap-6">
+        <h1 className="text-4xl font-black text-black mb-8">Редактировать пост</h1>
+
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="border-3 border-black shadow-[6px_6px_0px_#1A1A1A] bg-white p-6"
+        >
+          <TextField
+            label="Заголовок *"
+            placeholder="Введите заголовок"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            className="mb-1"
+          />
+
+          <div className="flex flex-col gap-1 mb-4">
+            <textarea
+              placeholder="Напишите что-нибудь..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={6}
+              className="w-full border-3 border-black shadow-[4px_4px_0px_#1A1A1A] px-3 py-3
+              text-sm font-medium bg-white outline-none
+              focus:ring-2 focus:ring-neo-accent
+              transition-shadow hover:shadow-[2px_2px_0px_#1A1A1A] resize-y"
+            />
+            <span className="text-xs text-gray-500 text-right">
+              {description.length} символов
+            </span>
+          </div>
+
+          <TextField
+            label="Ссылка на изображение"
+            placeholder="https://example.com/image.jpg"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            className="mb-6"
+          />
+
+          {imageUrl && (
+            <div className="mb-6 border-3 border-black p-2 bg-background">
+              <p className="text-xs font-bold mb-2">Предпросмотр:</p>
+              <img
+                src={imageUrl}
+                alt="Preview"
+                className="w-full max-h-48 object-cover border-2 border-black"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  setSubmitError('Не удалось загрузить изображение по ссылке');
+                }}
+              />
+            </div>
+          )}
+
+          <div className="flex gap-3 mb-4">
+            <ButtonSubmit className="flex-1">
+              Сохранить изменения
+            </ButtonSubmit>
+            <ButtonSubmit variant="accent" onClick={() => navigate(`/posts/${id}`)} className="flex-1">
+              Отмена
+            </ButtonSubmit>
+          </div>
+
+          {submitError && (<ErrorMessage message={submitError} />)}
+        </form>
+      </div>
+    </>
   );
 };

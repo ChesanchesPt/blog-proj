@@ -1,101 +1,40 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getPostById, upvotePost, downvotePost, deletePost } from '../api/posts';
-import { createComment, upvoteComment, downvoteComment, deleteComment } from '../api/comments';
-import { type Post, type Comment } from '../types';
+import { useRecentPosts } from '../contexts/RecentPostsContext';
+import { getPostById, deletePost, upvotePost, downvotePost } from '../api/posts';
+import { Navbar } from '../components/NavBar';
+import { VoteActions } from '../components/VoteActions';
+import { CommentCard } from '../components/CommentCard';
+import { CommentForm } from '../components/CommentForm';
+import { formatRelativeDate } from '../utils/dates';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { useApiCall } from '../hooks/useApiCall';
+import { ErrorMessage } from '../components/ErrorMessage';
 
 export const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const [post, setPost] = useState<Post | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [commentText, setCommentText] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const { data: post, loading, error, execute: loadPost } = useApiCall(
+    () => getPostById(Number(id)),
+    []
+  );
   const { user } = useAuth();
+  const { addRecentPost } = useRecentPosts();
   const navigate = useNavigate();
-
-  const isAuthor = user && post && user.id === post.authorId;
-  const isAdmin = user?.isAdmin || false;
-  const canModify = isAuthor || isAdmin;
 
   useEffect(() => {
     loadPost();
   }, [id]);
 
-  const loadPost = async () => {
-    try {
-      const res = await getPostById(Number(id));
-      setPost(res.data);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Не получилось загрузить пост');
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (post) {
+      addRecentPost(post);
     }
-  };
+  }, [post?.id]);
 
-  const handleUpvotePost = async () => {
-    if (!user) return;
-    try {
-      await upvotePost(Number(id));
-      await loadPost();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDownvotePost = async () => {
-    if (!user) return;
-    try {
-      await downvotePost(Number(id));
-      await loadPost();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!commentText.trim()) return;
-    setSubmitting(true);
-    try {
-      await createComment({ text: commentText, postId: Number(id) });
-      setCommentText('');
-      await loadPost(); // refresh comments
-    } catch (err: any) {
-      alert(err.response?.data?.error || 'Не удалось опубликовать комментарий');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleUpvoteComment = async (commentId: number) => {
-    try {
-      await upvoteComment(commentId);
-      await loadPost();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDownvoteComment = async (commentId: number) => {
-    try {
-      await downvoteComment(commentId);
-      await loadPost();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDeleteComment = async (commentId: number) => {
-    if (!confirm('Delete this comment?')) return;
-    try {
-      await deleteComment(commentId);
-      await loadPost();
-    } catch (err: any) {
-      alert(err.response?.data?.error || 'Не удалось удалить комментарий');
-    }
-  };
+  const isAuthor = user && post && user.id === post.authorId;
+  const isAdmin = user?.isAdmin || false;
+  const canModify = isAuthor || isAdmin;
 
   const handleDeletePost = async () => {
     if (!confirm('Delete this post? This will also delete all comments.')) return;
@@ -103,72 +42,87 @@ export const PostDetail = () => {
       await deletePost(Number(id));
       navigate('/');
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Не удалось удалить пост');
+      alert(err.response?.data?.error || 'Failed to delete post');
     }
   };
 
-  if (loading) return <div>Загрузка...</div>;
-  if (error) return <div style={{ color: 'red' }}>{error}</div>;
-  if (!post) return <div>Пост не найден</div>;
+  if (loading) return <><Navbar /><LoadingSpinner /></>;
+  if (error) return <><Navbar /><div className="max-w-2xl mx-auto px-4 py-8"><ErrorMessage message={error} /></div></>;
+  if (!post) return <><Navbar /><div className="max-w-2xl mx-auto px-4 py-8"><p className="font-bold text-xl">Post not found</p></div></>;
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-      <h1>{post.title}</h1>
-      <p>
-        By <Link to={`/users/${post.author.id}`}>{post.author.username}</Link> | 
-        Posted on {new Date(post.createdAt).toLocaleString()}
-      </p>
-      {post.imageUrl && <img src={post.imageUrl} alt="post" style={{ maxWidth: '100%' }} />}
-      <p>{post.description || '(no description)'}</p>
-
-      <div>
-        <button onClick={handleUpvotePost}>Upvote ({post.points})</button>
-        <button onClick={handleDownvotePost}>Downvote</button>
-        {canModify && (
-          <>
-            <Link to={`/edit/${post.id}`}><button>Редактировать</button></Link>
-            <button onClick={handleDeletePost} style={{ backgroundColor: 'red', color: 'white' }}>Удалить</button>
-          </>
-        )}
-      </div>
-
-      <hr />
-
-      <h3>Comments</h3>
-      {post.comments && post.comments.length === 0 ? (
-        <p>Комментариев пока нет. Будьте первым!</p>
-      ) : (
-        post.comments?.map((comment: Comment) => (
-          <div key={comment.id} style={{ border: '1px solid #eee', padding: '10px', margin: '10px 0' }}>
-            <p>{comment.text}</p>
-            <small>
-              От <Link to={`/users/${comment.author.id}`}>{comment.author.username}</Link> | 
-              Очков: {comment.points} | {new Date(comment.createdAt).toLocaleString()}
-            </small>
-            <div>
-              <button onClick={() => handleUpvoteComment(comment.id)}>⬆️</button>
-              <button onClick={() => handleDownvoteComment(comment.id)}>⬇️</button>
-              {(user?.id === comment.authorId || user?.isAdmin) && (
-                <button onClick={() => handleDeleteComment(comment.id)}>Удалить</button>
-              )}
-            </div>
+    <>
+      <Navbar />
+      <div className="max-w-2xl mx-auto px-4 py-8 font-mono">
+        <article className="border-3 border-black shadow-[6px_6px_0px_#1A1A1A] bg-white p-6 mb-6">
+          <h1 className="text-4xl font-black text-black mb-2">{post.title}</h1>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-gray-600 mb-4">
+            <span>
+              Автор{' '}
+              <Link to={`/users/${post.author.id}`} className="font-bold underline hover:bg-accent">
+                {post.author.username}
+              </Link>
+            </span>
+            <span>{formatRelativeDate(post.createdAt)}</span>
           </div>
-        ))
-      )}
 
-      {user && (
-        <form onSubmit={handleCommentSubmit}>
-          <textarea
-            rows={3}
-            placeholder="Напишите комментарий"
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            required
-            style={{ width: '100%', marginBottom: '10px' }}
-          />
-          <button type="submit" disabled={submitting}>Опубликовать</button>
-        </form>
-      )}
-    </div>
+          {post.imageUrl && (
+            <img
+              src={post.imageUrl}
+              alt={`Изображение для ${post.title}`}
+              className="w-full border-2 border-black rounded-md mb-4"
+            />
+          )}
+
+          <p className="text-base leading-relaxed whitespace-pre-line">
+            {post.description || '(нет описания)'}
+          </p>
+        </article>
+
+        <VoteActions
+          onUpvote={async () => {
+            if (!user) return;
+            try {
+              await upvotePost(post.id);
+              loadPost();
+            } catch (err) { console.error(err); }
+          }}
+          onDownvote={async () => {
+            if (!user) return;
+            try {
+              await downvotePost(post.id);
+              loadPost();
+            } catch (err) { console.error(err); }
+          }}
+          points={post.points}
+          canModify={canModify}
+          editUrl={`/edit/${post.id}`}
+          onDelete={handleDeletePost}
+        />
+
+        <section className="mt-8">
+          <h2 className="text-2xl font-black border-b-3 border-black pb-2 mb-4">
+            Комментарии ({post.comments?.length || 0})
+          </h2>
+
+          {user && (
+            <CommentForm postId={post.id} onCommentPosted={loadPost} />
+          )}
+
+          {post.comments?.length === 0 && (
+            <p className="text-gray-600 mb-4">Пока нет комментариев. Будьте первым!</p>
+          )}
+
+          {post.comments?.map((comment) => (
+            <CommentCard
+              key={comment.id}
+              comment={comment}
+              onDeleteSuccess={loadPost}
+              onVoteSuccess={loadPost}
+            />
+          ))}
+        </section>
+      </div>
+    </>
   );
 };

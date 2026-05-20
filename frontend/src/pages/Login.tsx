@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { TextField } from '../components/TextField';
 import { ButtonSubmit } from '../components/ButtonSubmit';
-import { ErrorMessage } from '../utils/loadingError';
+import { ErrorMessage } from '../components/ErrorMessage';
 
 export const Login = () => {
   const [username, setUsername] = useState('');
