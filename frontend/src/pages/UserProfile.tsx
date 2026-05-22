@@ -8,6 +8,7 @@ import { Navbar } from '../components/NavBar';
 import { PostCard } from '../components/PostCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
+import { ButtonSubmit } from '../components/ButtonSubmit';
 
 export const UserProfile = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -54,12 +55,9 @@ export const UserProfile = () => {
           <h1 className="text-4xl font-black text-black mb-2">{user.username}</h1>
           <p className="text-sm text-gray-600 mb-4">Joined: {new Date(user.createdAt).toLocaleDateString()}</p>
           {isOwnProfile && (
-            <button
-              onClick={handleLogout}
-              className="border-3 border-black bg-red-100 px-4 py-2 font-bold hover:shadow-[3px_3px_0px_#1A1A1A] active:translate-x-[2px] active:translate-y-[2px] transition-all"
-            >
+            <ButtonSubmit onClick={handleLogout}>
               Выйти
-            </button>
+            </ButtonSubmit>
           )}
         </div>
 
@@ -70,18 +68,12 @@ export const UserProfile = () => {
               Постов еще нет
             </div>
           ) : (
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6 items-center">
               {posts.map(post => (
                 <PostCard key={post.id} post={post} />
               ))}
             </div>
           )}
-        </div>
-
-        <div className="mt-8">
-          <Link to="/" className="text-neo-accent font-bold underline hover:no-underline">
-            ← На главную
-          </Link>
         </div>
       </div>
     </>

@@ -16,6 +16,6 @@ export const updatePost = (id: number, data: {title?: string, description?: stri
 
 export const deletePost = (id: number) => api.delete(`/posts/${id}`)
 
-export const upvotePost = (id: number) => api.post(`/posts/${id}/upvote`)
+export const upvotePost = (id: number) => api.post<{message:string; pointsDelta:number}>(`/posts/${id}/upvote`)
 
-export const downvotePost = (id: number) => api.post(`/posts/${id}/downvote`)
+export const downvotePost = (id: number) => api.post<{message:string; pointsDelta:number}>(`/posts/${id}/downvote`)

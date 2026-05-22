@@ -3,19 +3,25 @@ import { upvoteComment, downvoteComment, deleteComment } from '../api/comments';
 import { type Comment } from '../types';
 import { formatRelativeDate } from '../utils/dates';
 import { VoteActions } from './VoteActions';
+import { useAuth } from '../contexts/AuthContext';
 
 interface CommentCardProps {
   comment: Comment;
-  onDeleteSuccess: () => void;
-  onVoteSuccess: () => void;
+  onDeleteSuccess: (commentId: number) => void;
+  onVoteSuccess: (commentId: number, delta: number) => void;
 }
 
 export const CommentCard = ({ comment, onDeleteSuccess, onVoteSuccess }: CommentCardProps) => {
 
+  const { user } = useAuth();
+  const isAuthor = user && comment && user.id === comment.authorId;
+  const isAdmin = user?.isAdmin || false;
+  const canModify = isAuthor || isAdmin;
+
   const handleUpvote = async () => {
     try {
-      await upvoteComment(comment.id);
-      onVoteSuccess();
+      const response = await upvoteComment(comment.id);
+      onVoteSuccess(comment.id, response.data.pointsDelta);
     } catch (err) {
       console.error(err);
     }
@@ -23,8 +29,8 @@ export const CommentCard = ({ comment, onDeleteSuccess, onVoteSuccess }: Comment
 
   const handleDownvote = async () => {
     try {
-      await downvoteComment(comment.id);
-      onVoteSuccess();
+      const response = await downvoteComment(comment.id);
+      onVoteSuccess(comment.id, response.data.pointsDelta);
     } catch (err) {
       console.error(err);
     }
@@ -34,7 +40,7 @@ export const CommentCard = ({ comment, onDeleteSuccess, onVoteSuccess }: Comment
     if (!confirm('Delete this comment?')) return;
     try {
       await deleteComment(comment.id);
-      onDeleteSuccess();
+      onDeleteSuccess(comment.id);
     } catch (err: any) {
       alert(err.response?.data?.error || 'Не получилось удалить комментарий');
     }
@@ -53,13 +59,14 @@ export const CommentCard = ({ comment, onDeleteSuccess, onVoteSuccess }: Comment
 
         <p className="text-sm whitespace-pre-line">{comment.text}</p>
 
-        <div className="flex flex-wrap items-center gap-3 mt-2 text-xs font-medium text-gray-600">
-          <div className="flex gap-2 ml-auto">
+        <div >
+          <div className="mt-2">
             <VoteActions
               onUpvote={handleUpvote}
               onDownvote={handleDownvote}
               points={comment.points}
               onDelete={handleDelete}
+              canModify={canModify}
             />
           </div>
         </div>

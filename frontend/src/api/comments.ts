@@ -6,6 +6,6 @@ export const createComment = (data: {text: string, postId: number}) =>
 
 export const deleteComment = (id: number) => api.delete(`/comments/${id}`)
 
-export const upvoteComment = (id: number) => api.post(`/comments/${id}/upvote`)
+export const upvoteComment = (id: number) => api.post<{message:string; pointsDelta:number}>(`/comments/${id}/upvote`)
 
-export const downvoteComment = (id: number) => api.post(`/comments/${id}/downvote`)
+export const downvoteComment = (id: number) => api.post<{message:string; pointsDelta:number}>(`/comments/${id}/downvote`)

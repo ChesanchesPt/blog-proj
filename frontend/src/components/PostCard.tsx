@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { formatRelativeDate } from '../utils/dates';
 import { type Post } from '../types';
 import { useRecentPosts } from '../contexts/RecentPostsContext';
-import { ButtonSmall } from './ButtonSmall';
+import { upvotePost, downvotePost } from '../api/posts';
+import { VoteActions } from './VoteActions';
+import { useAuth } from '../contexts/AuthContext';
 
 interface PostCardProps {
   post: Post;
@@ -10,6 +13,8 @@ interface PostCardProps {
 
 export const PostCard = ({ post }: PostCardProps) => {
   const { addRecentPost } = useRecentPosts();
+  const { user } = useAuth();
+  const [localPoints, setLocalPoints] = useState<number>(post.points);
 
   return (
     <article
@@ -48,13 +53,30 @@ export const PostCard = ({ post }: PostCardProps) => {
       </p>
 
       <div className="mt-3 flex justify-between items-center text-xs font-medium text-gray-600">
-          <ButtonSmall variant='accent'>
+          <VoteActions 
+            onUpvote={async () => {
+              if (!user) return;
+              try {
+                const res = await upvotePost(post.id);
+                setLocalPoints((p) => p + res.data.pointsDelta);
+              } catch (err) { console.error(err); }
+            }}
+            onDownvote={async () => {
+              if (!user) return;
+              try {
+                const res = await downvotePost(post.id);
+                setLocalPoints((p) => p + res.data.pointsDelta);
+              } catch (err) { console.error(err); }
+            }}
+            points={localPoints}
+          />
+          {/* <ButtonSmall variant='accent'>
             <img src="/icons/plus.svg" alt="Плюс" className="w-3.5" />
           </ButtonSmall>
           {post.points}
           <ButtonSmall variant='accent'>
             <img src="/icons/minus.svg" alt="Минус" className="w-3.5" />
-          </ButtonSmall>
+          </ButtonSmall> */}
       </div>
     </article>
   );
