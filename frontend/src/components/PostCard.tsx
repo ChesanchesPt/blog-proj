@@ -33,7 +33,7 @@ export const PostCard = ({ post }: PostCardProps) => {
 
       <h2 className="text-x mb-2.5 font-bold">
         <Link 
-          to={`/posts/${post.id}`} 
+          to={`/post/${post.id}`} 
           onClick={() => addRecentPost(post)}
           className="hover:underline hover:decoration-accent hover:decoration-4">
           {post.title}

@@ -45,7 +45,7 @@ export const EditPost = () => {
     setSubmitError('');
     try {
       await updatePost(Number(id), { title, description, imageUrl: imageUrl || undefined });
-      navigate(`/posts/${id}`);
+      navigate(`/post/${id}`);
     } catch (err: any) {
       setSubmitError(err.response?.data?.error || 'Failed to update post');
     }
@@ -117,7 +117,7 @@ export const EditPost = () => {
             <ButtonSubmit className="flex-1">
               Сохранить изменения
             </ButtonSubmit>
-            <ButtonSubmit variant="accent" onClick={() => navigate(`/posts/${id}`)} className="flex-1">
+            <ButtonSubmit variant="accent" onClick={() => navigate(`/post/${id}`)} className="flex-1">
               Отмена
             </ButtonSubmit>
           </div>

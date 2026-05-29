@@ -1,5 +1,4 @@
 import { type SubmitEvent } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import { createComment } from '../api/comments';
 import type { Comment } from '../types';
 import { TextArea } from './TextArea';
@@ -14,7 +13,6 @@ interface CommentFormProps {
 export const CommentForm = ({ postId, onCommentPosted }: CommentFormProps) => {
   const [text, setText] = useState('');
   const [error, setError] = useState('');
-  const { user } = useAuth();
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
